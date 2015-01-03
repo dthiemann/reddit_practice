@@ -7,11 +7,12 @@
 
 import praw
 
+user_agent = "just having some fun /u/bassistdt"
+
 def main():
 
     # Get access to Reddit
     # try to keep user_agent as unique as possible
-    user_agent = "just having some fun /u/bassistdt"
     reddit = praw.Reddit(user_agent=user_agent)
 
     # Get the user
@@ -29,4 +30,21 @@ def main():
     
     return 0
 
-main()
+def getKarmaBreakdown(userName, userAgent):
+
+    # Get access to Reddit
+    # try to keep user_agent as unique as possible
+    reddit = praw.Reddit(user_agent=userAgent)
+
+    # Get the user
+    user = reddit.get_redditor(userName)
+
+    comments = user.get_submitted()
+    karma_by_subreddit = {}
+    for item in comments:
+        subreddit = item.subreddit.display_name
+        karma_by_subreddit[subreddit] = karma_by_subreddit.get(subreddit,0) + item.score
+
+    return karma_by_subreddit
+
+print(getKarmaBreakdown("NSFW_PORN_ONLY", user_agent))

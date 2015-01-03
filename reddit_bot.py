@@ -8,6 +8,7 @@
 import praw
 
 def main():
-
+    print("This will be a Reddit bot")
     return 0
 
+main()

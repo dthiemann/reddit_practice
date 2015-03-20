@@ -3,11 +3,11 @@
 #author: Dylan Thiemann
 #email: dylanthiemann@gmail.com
 
-#date: 1/1/14
+#date: 3/20/15
 
-import praw
+import praw, os
 
-user_agent = "just having some fun /u/bassistdt"
+user_agent = "myBotDT v0.1"
 
 def main():
 
@@ -30,7 +30,7 @@ def main():
     
     return 0
 
-def getKarmaBreakdown(userName, userAgent):
+def getKarmaBreakdown(userAgent, userName):
 
     # Get access to Reddit
     # try to keep user_agent as unique as possible
@@ -47,4 +47,47 @@ def getKarmaBreakdown(userName, userAgent):
 
     return karma_by_subreddit
 
-print(getKarmaBreakdown("NSFW_PORN_ONLY", user_agent))
+def getSubredditHotPosts(user_angent, subreddit, limit):
+    reddit = praw.Reddit(user_agent=user_agent)
+    subReddit = reddit.get_subreddit(subreddit)
+
+    for submission in subReddit.get_hot(limit = limit):
+        print("Title: " + submission.title)
+        print("Score: " + str(submission.score))
+
+    print("done")
+
+def commentingAndPosting(user_agent):
+    username = input("Enter Reddit user name: ")
+    pw = input("Enter Reddit password: ")
+
+    # Login to Reddit
+    r = praw.Reddit(user_agent=user_agent)
+    r.login(username, pw)
+
+    posts_replied_to = []
+
+    # Check to see if we have a list of posts replied to
+    if not os.path.isfile("posts_replied_to.txt"):
+        posts_replied_to = []
+    else:
+        with open("posts_replied_to.txt", "r") as f:
+            posts_replied_to = f.read()
+            posts_replied_to = posts_replied_to.split("\n")
+            posts_replied_to = filter(None, posts_replied_to)
+
+    # Use a testing subreddit designed for this - 'pythonforengineers'
+    subR = r.get_subreddit('pythonforengineers')
+    for submission in subR.get_hot(limit=5):
+
+        submission.add_comment("This is a test :-)")
+        print("bot replied to: ", submission.title)
+
+        posts_replied_to.append(submission.id)
+
+    with open("posts_replied_to.txt", "w") as f:
+        for post_id in posts_replied_to:
+            f.write(post_id + "\n")
+
+commentingAndPosting(user_agent)
+
